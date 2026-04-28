@@ -44,8 +44,6 @@ Used to determine:
 - IP addresses
 - CNAME chains
 
----
-
 2. RDAP (Registration Data Access Protocol)
 
 Queries:
