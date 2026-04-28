@@ -89,7 +89,6 @@ Then open:
 
 http://localhost:8000
 
----
 
 Option 2: Open directly (not recommended)
 
@@ -98,7 +97,6 @@ Opening the HTML file directly may cause:
 - DNS requests to fail
 - CORS errors
 
----
 
 Project Structure
 
@@ -107,7 +105,6 @@ domain-checker/
 ├── index.html   # Full app (HTML + CSS + JS)
 └── README.md    # Documentation
 
----
 
 Privacy
 
@@ -116,7 +113,6 @@ Privacy
 - All checks happen in-browser
 - History stored only in "localStorage"
 
----
 
 Limitations
 
@@ -125,7 +121,7 @@ Limitations
 - No HTTP status check (only DNS-level validation)
 - CORS policies may affect behavior
 
----
+
 
 Future Improvements
 
@@ -137,13 +133,12 @@ Future Improvements
 - Bulk domain checker
 - Backend API option
 
----
+
 
 Author
 
 Nwuzor Christian
 
----
 
 License
 
