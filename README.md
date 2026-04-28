@@ -7,7 +7,7 @@ It runs entirely in the browser — no backend required.
 
 Features
 
-- Instant domain checking
+-Instant domain checking
 - Supports:
   - Bare domains ("example.com")
   - Subdomains ("api.example.com")
@@ -26,8 +26,6 @@ Features
   - Not found (NXDOMAIN)
 - Local history (last 8 checks)
 - Clean, modern UI with animations
-
----
 
 How It Works
 
