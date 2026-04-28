@@ -4,7 +4,6 @@ Domain Checker is a fast, modern, and lightweight web tool that lets you instant
 
 It runs entirely in the browser — no backend required.
 
----
 
 Features
 
