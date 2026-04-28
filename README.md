@@ -68,7 +68,6 @@ No records but DNS OK| Registered (no config)
 NXDOMAIN| Not found
 DNS failure| Uncertain
 
----
 
 Setup
 
