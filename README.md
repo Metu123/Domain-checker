@@ -59,7 +59,6 @@ Used to fetch:
 - Domain status
 
 
-
 Status Logic
 
 Condition| Result
