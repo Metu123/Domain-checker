@@ -11,7 +11,7 @@ Features
 - Supports:
   - Bare domains ("google.com")
   - Subdomains ("api.google.com")
-  - Full URLs ("https://example.com")
+  - Full URLs ("https://google.com")
 - DNS Resolution:
   - A records (IP addresses)
   - CNAME records
