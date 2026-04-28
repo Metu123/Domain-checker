@@ -1,1 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Free domain name availability checker. Instantly verify if a URL or domain exists and is active." />
+  <meta name="keywords" content="domain checker, domain availability, URL checker, DNS lookup, domain exist" />
+  <meta name="author" content="DomainPulse" />
+  <meta property="og:title" content="DomainPulse — Domain Existence Checker" />
+  <meta property="og:description" content="Check if any domain or URL is live and reachable in seconds." />
+  <meta property="og:type" content="website" />
+  <title>DomainPulse — Domain Existence Checker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,300&display=swap" rel="stylesheet" />
 
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0c0f;
+      --surface: #111418;
+      --card: #161b22;
+      --border: #21262d;
+      --accent: #00e5b0;
+      --accent2: #0094ff;
+      --danger: #ff4d6d;
+      --warn: #ffb347;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --font-display: 'Fraunces', Georgia, serif;
+      --font-mono: 'DM Mono', 'Courier New', monospace;
+      --radius: 12px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-mono);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* ── Grid texture ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,229,176,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,176,.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Glow blobs ── */
+    .blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: .35;
+    }
+    .blob-1 { width: 500px; height: 500px; background: #00e5b044; top: -120px; left: -100px; }
+    .blob-2 { width: 400px; height: 400px; background: #0094ff33; bottom: -100px; right: -80px; }
+
+    /* ── Layout ── */
+    main {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 60px 20px 40px;
+      gap: 40px;
+    }
+
+    /* ── Header ── */
+    header {
+      text-align: center;
+      max-width: 620px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0,229,176,.1);
+      border: 1px solid rgba(0,229,176,.25);
+      border-radius: 999px;
+      padding: 4px 14px;
+      font-size: .7rem;
+      color: var(--accent);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    .badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse-dot 1.8s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%,100%{opacity:1;transform:scale(1)}
+      50%{opacity:.4;transform:scale(.6)}
+    }
+
+    h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2.2rem, 6vw, 3.8rem);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -.02em;
+      background: linear-gradient(135deg, #e6edf3 30%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
+    }
+
+    .subtitle {
+      font-size: .9rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* ── Search card ── */
+    .search-card {
+      width: 100%;
+      max-width: 680px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 8px 40px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.04);
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .input-wrap {
+      flex: 1;
+      min-width: 220px;
+      position: relative;
+    }
+
+    .input-wrap .icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 1rem;
+      pointer-events: none;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 14px 14px 40px;
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: .9rem;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    input[type="text"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0,229,176,.15);
+    }
+    input[type="text"]::placeholder { color: var(--muted); }
+
+    button.check-btn {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #000;
+      border: none;
+      border-radius: var(--radius);
+      padding: 14px 28px;
+      font-family: var(--font-mono);
+      font-size: .88rem;
+      font-weight: 500;
+      cursor: pointer;
+      letter-spacing: .04em;
+      transition: opacity .2s, transform .15s;
+      white-space: nowrap;
+    }
+    button.check-btn:hover { opacity: .88; transform: translateY(-1px); }
+    button.check-btn:active { transform: translateY(0); opacity: 1; }
+    button.check-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+    .hint {
+      font-size: .75rem;
+      color: var(--muted);
+      margin-top: 12px;
+    }
+
+    /* ── Result card ── */
+    .result-area {
+      width: 100%;
+      max-width: 680px;
+    }
+
+    .result-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px 28px;
+      box-shadow: 0 8px 40px rgba(0,0,0,.5);
+      animation: slide-up .35s cubic-bezier(.22,1,.36,1);
+      display: none;
+    }
+    .result-card.show { display: block; }
+
+    @keyframes slide-up {
+      from { opacity:0; transform:translateY(20px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .status-icon {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .status-icon.ok  { background: rgba(0,229,176,.15); }
+    .status-icon.err { background: rgba(255,77,109,.15); }
+    .status-icon.warn{ background: rgba(255,179,71,.15); }
+
+    .result-domain {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 700;
+      word-break: break-all;
+    }
+
+    .result-status-text {
+      font-size: .8rem;
+      margin-top: 3px;
+    }
+    .result-status-text.ok   { color: var(--accent); }
+    .result-status-text.err  { color: var(--danger); }
+    .result-status-text.warn { color: var(--warn); }
+
+    /* ── Info grid ── */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+    }
+
+    .info-tile {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+    }
+    .info-tile .label {
+      font-size: .68rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      margin-bottom: 6px;
+    }
+    .info-tile .value {
+      font-size: .88rem;
+      color: var(--text);
+      word-break: break-all;
+    }
+    .info-tile .value.mono { font-family: var(--font-mono); }
+    .info-tile .value.ok   { color: var(--accent); }
+    .info-tile .value.err  { color: var(--danger); }
+    .info-tile .value.warn { color: var(--warn); }
+
+    /* ── Loader ── */
+    .loader {
+      display: none;
+      width: 100%;
+      max-width: 680px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 36px;
+      text-align: center;
+      box-shadow: 0 8px 40px rgba(0,0,0,.5);
+    }
+    .loader.show { display: block; animation: slide-up .3s ease; }
+
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+      margin: 0 auto 14px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loader p { color: var(--muted); font-size: .85rem; }
+
+    /* ── History ── */
+    .history-section {
+      width: 100%;
+      max-width: 680px;
+    }
+    .history-section h2 {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .history-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .history-chip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 14px;
+      font-size: .75rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color .2s, color .2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .history-chip:hover { border-color: var(--accent); color: var(--accent); }
+    .history-chip .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .history-chip .dot.ok  { background: var(--accent); }
+    .history-chip .dot.err { background: var(--danger); }
+
+    /* ── Footer ── */
+    footer {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 20px;
+      font-size: .72rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 500px) {
+      .search-card { padding: 20px; }
+      .result-card { padding: 18px 20px; }
+      h1 { font-size: 2rem; }
+      .info-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="blob blob-1" aria-hidden="true"></div>
+  <div class="blob blob-2" aria-hidden="true"></div>
+
+  <main>
+    <header>
+      <div class="badge">Free · Instant · No Login</div>
+      <h1>DomainPulse</h1>
+      <p class="subtitle">Instantly check whether a domain or URL is live, reachable, and returning a valid response — powered by public DNS & availability APIs.</p>
+    </header>
+
+    <!-- Search -->
+    <section class="search-card" aria-label="Domain checker form">
+      <div class="input-row">
+        <div class="input-wrap">
+          <span class="icon" aria-hidden="true">🌐</span>
+          <input
+            type="text"
+            id="domainInput"
+            placeholder="google.com or https://example.com"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="none"
+            spellcheck="false"
+            aria-label="Enter a domain or URL to check"
+          />
+        </div>
+        <button class="check-btn" id="checkBtn" onclick="checkDomain()" aria-label="Check domain">
+          Check →
+        </button>
+      </div>
+      <p class="hint">Works with bare domains (example.com), subdomains (sub.example.com), and full URLs.</p>
+    </section>
+
+    <!-- Loader -->
+    <div class="loader" id="loader" role="status" aria-live="polite">
+      <div class="spinner"></div>
+      <p>Pinging servers &amp; resolving DNS…</p>
+    </div>
+
+    <!-- Result -->
+    <section class="result-area" aria-live="polite">
+      <div class="result-card" id="resultCard">
+        <div class="result-header">
+          <div class="status-icon" id="statusIcon"></div>
+          <div>
+            <div class="result-domain" id="resultDomain"></div>
+            <div class="result-status-text" id="resultStatusText"></div>
+          </div>
+        </div>
+        <div class="info-grid" id="infoGrid"></div>
+      </div>
+    </section>
+
+    <!-- History -->
+    <section class="history-section" id="historySection" aria-label="Recent checks" style="display:none">
+      <h2>Recent checks</h2>
+      <div class="history-list" id="historyList"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>DomainPulse uses public APIs (DNS-over-HTTPS &amp; RDAP). No data is stored. &copy; <span id="yr"></span> DomainPulse.</p>
+  </footer>
+
+  <script>
+    document.getElementById('yr').textContent = new Date().getFullYear();
+
+    // Enter key support
+    document.getElementById('domainInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') checkDomain();
+    });
+
+    // ── History ──
+    let history = JSON.parse(localStorage.getItem('dp_history') || '[]');
+
+    function saveHistory(domain, ok) {
+      history = history.filter(h => h.domain !== domain);
+      history.unshift({ domain, ok });
+      if (history.length > 8) history = history.slice(0, 8);
+      localStorage.setItem('dp_history', JSON.stringify(history));
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const sec  = document.getElementById('historySection');
+      const list = document.getElementById('historyList');
+      if (!history.length) { sec.style.display = 'none'; return; }
+      sec.style.display = 'block';
+      list.innerHTML = history.map(h => `
+        <button class="history-chip" onclick="prefill('${h.domain}')" title="Re-check ${h.domain}">
+          <span class="dot ${h.ok ? 'ok' : 'err'}"></span>
+          ${escHtml(h.domain)}
+        </button>
+      `).join('');
+    }
+
+    function prefill(domain) {
+      document.getElementById('domainInput').value = domain;
+      checkDomain();
+    }
+
+    renderHistory();
+
+    // ── Helpers ──
+    function escHtml(s) {
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function extractDomain(raw) {
+      raw = raw.trim().toLowerCase();
+      if (!raw) return null;
+      // Add protocol if missing so URL can parse it
+      if (!/^https?:\/\//i.test(raw)) raw = 'https://' + raw;
+      try {
+        const u = new URL(raw);
+        return u.hostname.replace(/^www\./, '');
+      } catch {
+        return null;
+      }
+    }
+
+    function setLoading(on) {
+      document.getElementById('loader').classList.toggle('show', on);
+      document.getElementById('resultCard').classList.toggle('show', !on && resultVisible);
+      document.getElementById('checkBtn').disabled = on;
+    }
+
+    let resultVisible = false;
+
+    // ── DNS lookup: tries multiple providers ──
+    async function dnsLookup(domain) {
+      const endpoints = [
+        // Google DoH – best CORS support
+        `https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=A`,
+        // Cloudflare DoH
+        `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(domain)}&type=A`,
+      ];
+      let lastErr;
+      for (const url of endpoints) {
+        try {
+          const res = await fetch(url, { headers: { Accept: 'application/dns-json' }, mode: 'cors' });
+          if (res.ok) return res.json();
+        } catch(e) { lastErr = e; }
+      }
+      throw lastErr || new Error('All DNS providers failed');
+    }
+
+    // ── Also look up CNAME records ──
+    async function cnameLoookup(domain) {
+      try {
+        const res = await fetch(`https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=CNAME`,
+          { headers: { Accept: 'application/dns-json' }, mode: 'cors' });
+        if (!res.ok) return null;
+        return res.json();
+      } catch { return null; }
+    }
+
+    // ── RDAP (domain registration) ──
+    async function rdapLookup(domain) {
+      // Try RDAP bootstrap first, then rdap.org
+      const endpoints = [
+        `https://rdap.org/domain/${encodeURIComponent(domain)}`,
+        `https://rdap.verisign.com/com/v1/domain/${encodeURIComponent(domain)}`,
+      ];
+      for (const url of endpoints) {
+        try {
+          const res = await fetch(url, { mode: 'cors' });
+          if (res.ok) return res.json();
+        } catch {}
+      }
+      return null;
+    }
+
+    // ── Main check ──
+    async function checkDomain() {
+      const raw = document.getElementById('domainInput').value;
+      const domain = extractDomain(raw);
+
+      if (!domain || domain.length < 3) {
+        showError('Please enter a valid domain or URL.');
+        return;
+      }
+
+      resultVisible = false;
+      document.getElementById('resultCard').classList.remove('show');
+      setLoading(true);
+
+      try {
+        // Run DNS (A + CNAME) + RDAP in parallel
+        const [dnsData, cnameData, rdapData] = await Promise.allSettled([
+          dnsLookup(domain),
+          cnameLoookup(domain),
+          rdapLookup(domain)
+        ]);
+
+        const dns   = dnsData.status  === 'fulfilled' ? dnsData.value  : null;
+        const cname = cnameData.status === 'fulfilled' ? cnameData.value : null;
+        const rdap  = rdapData.status  === 'fulfilled' ? rdapData.value : null;
+
+        // If DNS query itself failed entirely (CORS / network block)
+        if (!dns) throw new Error('DNS query returned no data');
+
+        const aRecords     = dns?.Answer?.filter(r => r.type === 1)  || [];
+        const cnameRecords = (cname?.Answer?.filter(r => r.type === 5) || [])
+                             .concat(dns?.Answer?.filter(r => r.type === 5) || []);
+        const hasIP        = aRecords.length > 0;
+        const hasCname     = cnameRecords.length > 0;
+        const dnsStatus    = dns?.Status; // 0 = NOERROR, 3 = NXDOMAIN
+
+        let domainExists = false;
+        let statusLabel  = '';
+        let statusClass  = '';
+        let icon         = '';
+
+        if (dnsStatus === 0 && hasIP) {
+          domainExists = true;
+          statusLabel = '✔ Domain is live and resolving';
+          statusClass = 'ok';
+          icon        = '✅';
+        } else if (dnsStatus === 0 && hasCname) {
+          domainExists = true;
+          statusLabel = '✔ Domain exists (CNAME resolved)';
+          statusClass = 'ok';
+          icon        = '✅';
+        } else if (dnsStatus === 3) {
+          domainExists = false;
+          statusLabel = '✖ Domain does not exist (NXDOMAIN)';
+          statusClass = 'err';
+          icon        = '❌';
+        } else if (dnsStatus === 0 && !hasIP && !hasCname) {
+          domainExists = true;
+          statusLabel = '⚠ Domain is registered but has no A/CNAME record';
+          statusClass = 'warn';
+          icon        = '⚠️';
+        } else {
+          domainExists = false;
+          statusLabel = '⚠ Unable to resolve — domain may not exist';
+          statusClass = 'warn';
+          icon        = '⚠️';
+        }
+
+        // IP / CNAME list
+        const ips       = aRecords.map(r => r.data).join(', ') || (hasCname ? '(via CNAME)' : '—');
+        const cnameVal  = cnameRecords.map(r => r.data).join(', ') || '—';
+        const ttl       = aRecords[0]?.TTL ?? cnameRecords[0]?.TTL ?? '—';
+
+        // RDAP info
+        const regDate    = rdap?.events?.find(e => e.eventAction === 'registration')?.eventDate;
+        const expDate    = rdap?.events?.find(e => e.eventAction === 'expiration')?.eventDate;
+        const registrar  = rdap?.entities?.find(e => e.roles?.includes('registrar'))?.vcardArray?.[1]
+                             ?.find(v => v[0] === 'fn')?.[3] || null;
+        const status     = rdap?.status?.join(', ') || null;
+
+        function fmtDate(d) {
+          if (!d) return '—';
+          try { return new Date(d).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' }); }
+          catch { return d; }
+        }
+
+        // Build tiles
+        const tiles = [
+          { label: 'Domain', value: domain, cls: '' },
+          { label: 'Status', value: domainExists ? (hasIP ? 'Active' : hasCname ? 'Active (CNAME)' : 'Registered') : 'Not found', cls: statusClass },
+          { label: 'IP Address(es)', value: ips, cls: 'mono' },
+          { label: 'CNAME', value: cnameVal, cls: 'mono' },
+          { label: 'DNS TTL', value: ttl !== '—' ? ttl + 's' : '—', cls: 'mono' },
+          { label: 'Registered', value: fmtDate(regDate), cls: '' },
+          { label: 'Expires', value: fmtDate(expDate), cls: '' },
+          { label: 'Registrar', value: registrar || '—', cls: '' },
+          { label: 'Registry Status', value: status || '—', cls: '' },
+        ];
+
+        // Render
+        document.getElementById('statusIcon').className = `status-icon ${statusClass}`;
+        document.getElementById('statusIcon').textContent = icon;
+        document.getElementById('resultDomain').textContent = domain;
+        document.getElementById('resultStatusText').className = `result-status-text ${statusClass}`;
+        document.getElementById('resultStatusText').textContent = statusLabel;
+
+        document.getElementById('infoGrid').innerHTML = tiles.map(t => `
+          <div class="info-tile">
+            <div class="label">${escHtml(t.label)}</div>
+            <div class="value ${t.cls}">${escHtml(String(t.value))}</div>
+          </div>
+        `).join('');
+
+        resultVisible = true;
+        setLoading(false);
+        document.getElementById('resultCard').classList.add('show');
+        saveHistory(domain, domainExists);
+
+      } catch (err) {
+        setLoading(false);
+        const msg = err?.message?.includes('DNS query returned no data')
+          ? 'DNS lookup failed — your browser may be blocking the request. Try opening the file via a local server (e.g. VS Code Live Server) instead of directly from the file system.'
+          : 'Network error — please check your connection and try again.';
+        showError(msg);
+        console.error(err);
+      }
+    }
+
+    function showError(msg) {
+      resultVisible = true;
+      setLoading(false);
+      document.getElementById('statusIcon').className = 'status-icon err';
+      document.getElementById('statusIcon').textContent = '⚠️';
+      document.getElementById('resultDomain').textContent = 'Error';
+      document.getElementById('resultStatusText').className = 'result-status-text err';
+      document.getElementById('resultStatusText').textContent = msg;
+      document.getElementById('infoGrid').innerHTML = '';
+      document.getElementById('resultCard').classList.add('show');
+    }
+  </script>
+</body>
+</html>
