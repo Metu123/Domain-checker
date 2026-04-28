@@ -9,7 +9,7 @@ Features
 
 -Instant domain checking
 - Supports:
-  - Bare domains ("example.com")
+  - Bare domains ("goggle.com")
   - Subdomains ("api.example.com")
   - Full URLs ("https://example.com")
 - DNS Resolution:
