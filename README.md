@@ -58,7 +58,7 @@ Used to fetch:
 - Registrar
 - Domain status
 
----
+
 
 Status Logic
 
