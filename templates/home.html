@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Welcome — domain-checker{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Domain Checker</h1>
+            <p class="hero-subtitle">Instantly verify if a domain is live, registered, and reachable.</p>
+            <div class="hero-badges">
+                <span class="badge">⚡ Instant Checks</span>
+                <span class="badge">🔒 Private & Secure</span>
+                <span class="badge">✓ Real-time Results</span>
+            </div>
+            
+            {% if user.is_authenticated %}
+                <div class="hero-actions">
+                    <a href="{% url 'checker' %}" class="btn btn-primary btn-lg">Start Checking</a>
+                    <a href="{% url 'check_history' %}" class="btn btn-secondary btn-lg">View History</a>
+                </div>
+            {% else %}
+                <div class="hero-actions">
+                    <a href="{% url 'signup' %}" class="btn btn-primary btn-lg">Get Started Free</a>
+                    <a href="{% url 'login' %}" class="btn btn-secondary btn-lg">Already have an account?</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="features">
+        <div class="feature-card">
+            <div class="feature-icon">🔍</div>
+            <h3>DNS Resolution</h3>
+            <p>Check A records, CNAME chains, and IP addresses instantly</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📋</div>
+            <h3>Registration Data</h3>
+            <p>View registrar info, registration date, and expiry status</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">💾</div>
+            <h3>Check History</h3>
+            <p>Securely save and access your domain checks anytime</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

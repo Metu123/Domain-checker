@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Check History — domain-checker{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="history-container">
+        <div class="history-header">
+            <h1>Domain Check History</h1>
+            <p>All your previous domain checks</p>
+            <a href="{% url 'checker' %}" class="btn btn-secondary">Back to Checker</a>
+        </div>
+
+        {% if history %}
+            <div class="history-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Domain</th>
+                            <th>Status</th>
+                            <th>Checked</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for check in history %}
+                            <tr>
+                                <td>
+                                    <code>{{ check.domain }}</code>
+                                </td>
+                                <td>
+                                    <span class="status-badge status-{{ check.status }}">
+                                        {{ check.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>{{ check.checked_at|date:"M d, Y H:i" }}</td>
+                                <td>
+                                    <a href="{% url 'check_detail' check.id %}" class="link-button">View Details</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">📋</div>
+                <h3>No checks yet</h3>
+                <p>Start checking domains to build your history</p>
+                <a href="{% url 'checker' %}" class="btn btn-primary">Go to Checker</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

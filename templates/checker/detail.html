@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ check.domain }} — domain-checker{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="detail-container">
+        <div class="detail-header">
+            <a href="{% url 'check_history' %}" class="back-link">← Back to History</a>
+            <h1>{{ check.domain }}</h1>
+            <span class="status-badge status-{{ check.status }}">{{ check.get_status_display }}</span>
+        </div>
+
+        <div class="detail-timestamp">
+            Checked on {{ check.checked_at|date:"F j, Y \a\t H:i" }}
+        </div>
+
+        {% if check.status == 'active' or check.status == 'registered' %}
+            {% if check.ip_addresses %}
+                <div class="detail-section">
+                    <h2>IP Addresses</h2>
+                    <div class="ip-addresses">
+                        {% for ip in check.ip_addresses %}
+                            <div class="ip-item">
+                                <code>{{ ip }}</code>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if check.registrar or check.registration_date or check.expiry_date %}
+                <div class="detail-section">
+                    <h2>Registration Details</h2>
+                    <div class="details-grid">
+                        {% if check.registrar %}
+                            <div class="detail-item">
+                                <label>Registrar</label>
+                                <p>{{ check.registrar }}</p>
+                            </div>
+                        {% endif %}
+                        {% if check.registration_date %}
+                            <div class="detail-item">
+                                <label>Registration Date</label>
+                                <p>{{ check.registration_date }}</p>
+                            </div>
+                        {% endif %}
+                        {% if check.expiry_date %}
+                            <div class="detail-item">
+                                <label>Expiry Date</label>
+                                <p>{{ check.expiry_date }}</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="detail-section">
+                <p class="empty-message">This domain could not be accessed or is not registered.</p>
+            </div>
+        {% endif %}
+
+        <div class="detail-actions">
+            <a href="{% url 'checker' %}" class="btn btn-primary">Check Another Domain</a>
+            <a href="{% url 'check_history' %}" class="btn btn-secondary">View History</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}Domain Checker — domain-checker{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="checker-container">
+        <div class="checker-header">
+            <h1>Domain Checker</h1>
+            <p>Enter a domain to check its availability and details</p>
+        </div>
+
+        {# Check Form #}
+        <div class="checker-form-section">
+            <form method="post" class="checker-form">
+                {% csrf_token %}
+                <div class="input-wrapper">
+                    {{ form.domain }}
+                    <button type="submit" class="btn-check">
+                        <span>Check</span>
+                    </button>
+                </div>
+                {% if form.domain.errors %}
+                    <div class="form-errors">
+                        {% for error in form.domain.errors %}
+                            <div class="error-message">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </form>
+        </div>
+
+        {# Results #}
+        {% if result %}
+            <div class="result-card">
+                <div class="result-header">
+                    <h2>{{ result.domain }}</h2>
+                    <span class="status-badge status-{{ result.status }}">
+                        {{ result.get_status_display }}
+                    </span>
+                </div>
+
+                {% if result.status == 'active' or result.status == 'registered' %}
+                    <div class="result-section">
+                        <h3>IP Addresses</h3>
+                        {% if result.ip_addresses %}
+                            <ul class="ip-list">
+                                {% for ip in result.ip_addresses %}
+                                    <li><code>{{ ip }}</code></li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="no-data">No IP addresses found</p>
+                        {% endif %}
+                    </div>
+
+                    {% if result.registrar or result.registration_date or result.expiry_date %}
+                        <div class="result-section">
+                            <h3>Registration Information</h3>
+                            <div class="info-grid">
+                                {% if result.registrar %}
+                                    <div class="info-item">
+                                        <label>Registrar</label>
+                                        <p>{{ result.registrar }}</p>
+                                    </div>
+                                {% endif %}
+                                {% if result.registration_date %}
+                                    <div class="info-item">
+                                        <label>Registered</label>
+                                        <p>{{ result.registration_date }}</p>
+                                    </div>
+                                {% endif %}
+                                {% if result.expiry_date %}
+                                    <div class="info-item">
+                                        <label>Expires</label>
+                                        <p>{{ result.expiry_date }}</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="result-message">
+                        <p>The domain could not be accessed. Please verify the domain name and try again.</p>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        {# History #}
+        {% if history %}
+            <div class="history-section">
+                <h3>Recent Checks</h3>
+                <div class="history-list">
+                    {% for check in history %}
+                        <a href="{% url 'check_detail' check.id %}" class="history-item">
+                            <div class="history-domain">{{ check.domain }}</div>
+                            <div class="history-status">
+                                <span class="status-badge status-{{ check.status }}">{{ check.get_status_display }}</span>
+                                <span class="history-time">{{ check.checked_at|date:"M d, Y H:i" }}</span>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+                <div class="history-footer">
+                    <a href="{% url 'check_history' %}" class="link-button">View all checks →</a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

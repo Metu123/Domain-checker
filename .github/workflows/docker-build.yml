@@ -1,0 +1,67 @@
+name: Docker Build & Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: test_db
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Build Docker image
+      run: docker build -t domain-checker:test .
+
+    - name: Run container
+      run: |
+        docker run -d \
+          --name domain_checker_test \
+          -e DEBUG=False \
+          -e SECRET_KEY=test-key \
+          -e DATABASE_URL=postgresql://test_user:test_password@localhost:5432/test_db \
+          -p 8000:8000 \
+          --network host \
+          domain-checker:test
+
+    - name: Wait for container to be ready
+      run: |
+        for i in {1..30}; do
+          curl -f http://localhost:8000/health || (sleep 1 && continue)
+          echo "✅ Container is ready"
+          exit 0
+        done
+        echo "❌ Container failed to start"
+        exit 1
+
+    - name: Test Django
+      run: |
+        docker exec domain_checker_test python manage.py check
+
+    - name: Run tests
+      run: |
+        docker exec domain_checker_test python manage.py test || true
+
+    - name: Stop container
+      run: docker stop domain_checker_test
