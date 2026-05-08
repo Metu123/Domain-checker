@@ -1,6 +1,6 @@
 FROM python:3.11-slim
 
-# Set environment variables
+# Environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
@@ -19,14 +19,14 @@ COPY requirements.txt .
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Copy project
+# Copy project files
 COPY . .
 
-# Collect static files
-RUN python manage.py collectstatic --noinput || true
+# Make start.sh executable
+RUN chmod +x /app/start.sh
 
 # Expose port
 EXPOSE 8000
 
-# Run gunicorn
-CMD ["gunicorn", "domain_checker.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "4"]
+# Start application
+CMD ["sh", "/app/start.sh"]
