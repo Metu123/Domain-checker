@@ -4,7 +4,7 @@ A modern Django-based domain checker application with user authentication, real-
 
 ## Features
 
-✨ **Core Features**
+  **Core Features**
 - Instant domain availability checks
 - DNS resolution (A records, CNAME chains)
 - RDAP registration data lookup
@@ -12,27 +12,27 @@ A modern Django-based domain checker application with user authentication, real-
 - Registration & expiry dates
 - Smart status detection
 
-🔐 **Authentication**
+ **Authentication**
 - User registration and login
 - Secure password hashing
 - User profiles
 - Session management
 - Logout functionality
 
-💾 **History & Storage**
+ **History & Storage**
 - Save all domain checks
 - View check history
 - Detailed check information
 - User-specific records
 
-🎨 **User Interface**
+ **User Interface**
 - Dark theme with gradient accents
 - Responsive mobile design
 - Real-time results
 - Beautiful animations
 - Admin dashboard
 
-🐳 **Docker Support**
+ **Docker Support**
 - Production-ready Dockerfile
 - Docker Compose with PostgreSQL & Nginx
 - Development mode with hot-reload
