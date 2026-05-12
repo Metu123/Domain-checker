@@ -11,7 +11,7 @@ python manage.py collectstatic --noinput
 echo "Starting Gunicorn..."
 
 exec gunicorn domain_checker.wsgi:application \
-  --bind 0.0.0.0:8000 \
+  --bind 0.0.0.0:3000 \
   --workers 4 \
   --timeout 120 \
   --access-logfile - \
