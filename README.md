@@ -65,9 +65,9 @@ docker-compose exec web python manage.py createsuperuser
 ```
 
 **Access the app:**
-- 🌐 Main app: http://localhost
-- 🔧 Admin: http://localhost/admin
-- 📚 API: http://localhost/checker
+-  Main app: http://localhost
+-  Admin: http://localhost/admin
+-  API: http://localhost/checker
 
 ## Quick Start - Local Development
 
