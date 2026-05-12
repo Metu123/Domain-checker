@@ -26,7 +26,7 @@ COPY . .
 RUN chmod +x /app/start.sh
 
 # Expose port
-EXPOSE 8000
+EXPOSE 3000
 
 # Start application
 CMD ["sh", "/app/start.sh"]
